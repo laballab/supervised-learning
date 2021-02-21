@@ -6,6 +6,7 @@ import seaborn as sns
 import sklearn as sk
 
 from sklearn import metrics
+from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -26,6 +27,7 @@ from common import check_cv_score
 from common import check_test_score
 from common import dtree_sample_split
 from common import svm_params 
+from common import nn_params 
 
 pd.options.display.max_colwidth = 150
 pd.options.display.max_rows = 200
@@ -159,44 +161,75 @@ y_test  = test['esrb_rating']
 # # %% going with entropy for final model, score 0.844
 # check_test_score(entropy_dtree, x_train, y_train, x_test, y_test)
 # %% 
-# [DT MODEL]
+# [SVM MODEL]
 #
-# %% we start by doing a grid search
-svm = SVC()
-params = svm_params 
+# # %% we start by doing a grid search
+# svm = SVC()
+# params = svm_params 
+# print(params)
+# grid_results = grid_search(svm, params, x_train, y_train)
+# grid_results
+# # %%
+# tuned_svm = SVC(C=1, kernel='rbf')
+# plot_vc(tuned_svm, x_train, y_train, 'gamma',[i for i in np.linspace(0,1,100)])
+# params = { 'gamma': [i for i in np.linspace(0,1,20)]}
+# grid_results = grid_search(tuned_svm, params, x_train, y_train)
+# grid_results
+# # %% the default parameters work very well for this model (C=1, kernel='rbf')
+# plot_lc(tuned_svm, x_train, y_train)
+# # %% default model achieves whopping 0.908
+# check_cv_score(tuned_svm, x_train, y_train)
+# # %% we would still like to investigate other kernels, expecially poly
+# poly_svm = SVC(C=1, kernel='poly')
+# plot_vc(poly_svm, x_train, y_train, 'degree', [i for i in range(1,5)])
+# params = { 'degree': [i for i in range(1,5)]}
+# grid_results = grid_search(poly_svm, params, x_train, y_train)
+# grid_results
+# # %% we  establish the best degree of the poly func, now we tune with that degree
+# poly_svm = SVC(kernel='poly', degree=1)
+# plot_vc(poly_svm, x_train, y_train, 'C', [i for i in np.linspace(0,1,50)])
+# params = { 'C': [i for i in np.linspace(0,1,10)],
+#        'coef0': [i for i in np.linspace(0,1,10)],
+#        'gamma': [i for i in np.linspace(0,1,10)]
+# }
+# grid_results = grid_search(poly_svm, params, x_train, y_train)
+# grid_results
+# # %% we arrive a tuned poly model
+# tuned_poly_svm = SVC(kernel='poly', degree=1, coef0=0.111)
+# plot_vc(tuned_poly_svm, x_train, y_train, 'gamma', [i for i in np.linspace(0,1,50)])
+# # %% unfortunately it's not as good as the original svm model..
+# plot_lc(tuned_poly_svm, x_train, y_train)
+# # %%
+# check_cv_score(tuned_poly_svm, x_train, y_train)
+# %% 
+# [NN MODEL]
+#
+# %% 
+mlp = MLPClassifier()
+params = nn_params 
 print(params)
-grid_results = grid_search(svm, params, x_train, y_train)
-grid_results
+# grid_results = grid_search(mlp, params, x_train, y_train)
+# grid_results
+# %% both relu & tanh models show promise, compare them both
+relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,))
+plot_vc(relu_mlp, x_train, y_train, 'alpha', [i for i in np.linspace(0,2,24)])
+tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50))
+plot_vc(tanh_mlp, x_train, y_train, 'alpha', [i for i in np.linspace(0,2,24)])
 # %%
-tuned_svm = SVC(C=1, kernel='rbf')
-plot_vc(tuned_svm, x_train, y_train, 'gamma',[i for i in np.linspace(0,1,100)])
-params = { 'gamma': [i for i in np.linspace(0,1,20)]}
-grid_results = grid_search(tuned_svm, params, x_train, y_train)
-grid_results
-# %% the default parameters work very well for this model (C=1, kernel='rbf')
-plot_lc(tuned_svm, x_train, y_train)
-# %% default model achieves whopping 0.908
-check_cv_score(tuned_svm, x_train, y_train)
-# %% we would still like to investigate other kernels, expecially poly
-poly_svm = SVC(C=1, kernel='poly')
-plot_vc(poly_svm, x_train, y_train, 'degree', [i for i in range(1,5)])
-params = { 'degree': [i for i in range(1,5)]}
-grid_results = grid_search(poly_svm, params, x_train, y_train)
-grid_results
-# %% we  establish the best degree of the poly func, now we tune with that degree
-poly_svm = SVC(kernel='poly', degree=1)
-plot_vc(poly_svm, x_train, y_train, 'C', [i for i in np.linspace(0,1,50)])
-params = { 'C': [i for i in np.linspace(0,1,10)],
-       'coef0': [i for i in np.linspace(0,1,10)],
-       'gamma': [i for i in np.linspace(0,1,10)]
-}
-grid_results = grid_search(poly_svm, params, x_train, y_train)
-grid_results
-# %% we arrive a tuned poly model
-tuned_poly_svm = SVC(kernel='poly', degree=1, coef0=0.111)
-plot_vc(tuned_poly_svm, x_train, y_train, 'gamma', [i for i in np.linspace(0,1,50)])
-# %% unfortunately it's not as good as the original svm model..
-plot_lc(tuned_poly_svm, x_train, y_train)
+tuned_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087)
+tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0)
+check_cv_score(tuned_relu_mlp, x_train, y_train)
+check_cv_score(tuned_tanh_mlp, x_train, y_train)
+plot_lc(tuned_relu_mlp, x_train, y_train)
+plot_lc(tuned_tanh_mlp, x_train, y_train)
 # %%
-check_cv_score(tuned_poly_svm, x_train, y_train)
+plot_vc(tuned_relu_mlp, x_train, y_train, 'learning_rate_init', [i for i in np.linspace(0,10,100)])
+plot_vc(tuned_tanh_mlp, x_train, y_train, 'learning_rate_init', [i for i in np.linspace(0,10,100)])
+# %%
+tuned_init_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087,learning_rate_init=0.101)
+tuned_init_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0,learning_rate_init=0.101)
+check_cv_score(tuned_init_relu_mlp, x_train, y_train)
+check_cv_score(tuned_init_tanh_mlp, x_train, y_train)
+plot_lc(tuned_init_relu_mlp, x_train, y_train)
+plot_lc(tuned_init_tanh_mlp, x_train, y_train)
 # %%

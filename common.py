@@ -46,6 +46,11 @@ knn_params = {
     'n_neighbors': [i for i in range(1,42)],
     'weights' : ['uniform', 'distance']
 }
+nn_params = {
+    'activation': ['identity', 'logistic', 'tanh', 'relu'],
+    'solver': ['lbfgs', 'sgd', 'adam'],
+    'hidden_layer_sizes': [(100,), (50,50), (30,30,30),(10,10,10,10,10,10,10,10,10)]
+}
 # %%
 def plot_vc(model, x, y, param_key, param_val, cv=5):
     print(cross_val_score(model, x, y, scoring='accuracy', cv=cv))
@@ -54,6 +59,10 @@ def plot_vc(model, x, y, param_key, param_val, cv=5):
     std_train_score = np.std(train_score, axis = 1) 
     mean_test_score = np.mean(test_score, axis = 1) 
     std_test_score = np.std(test_score, axis = 1) 
+
+    params = {}
+    params[param_key] = param_val
+    print(grid_search(model, params, x, y, cv))
 
     # Creating the plot 
     plt.plot(param_val, mean_train_score,  
