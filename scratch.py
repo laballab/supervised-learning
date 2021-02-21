@@ -12,6 +12,7 @@ import seaborn as sns
 import sklearn as sk
 
 from sklearn import metrics
+from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -23,8 +24,17 @@ from sklearn.svm import SVC
 from sklearn.model_selection import validation_curve
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import Ridge
-from common import plot_lc
+from common import check_cv_score, grid_search, plot_lc
 from common import plot_vc
+from common import dtree_params
+from common import dtree_extended_params
+from common import knn_params
+from common import check_cv_score
+from common import check_test_score
+from common import dtree_sample_split
+from common import svm_params 
+from common import nn_params 
+from common import nn_learning_params 
 
 # basic structure from:
 # https://www.kaggle.com/jchen2186/machine-learning-with-iris-dataset

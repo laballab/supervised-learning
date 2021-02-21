@@ -28,6 +28,9 @@ from common import check_test_score
 from common import dtree_sample_split
 from common import svm_params 
 from common import nn_params 
+from common import nn_learning_params 
+from common import nn_adam_params 
+from common import nn_adam_tuned_params
 
 pd.options.display.max_colwidth = 150
 pd.options.display.max_rows = 200
@@ -211,25 +214,60 @@ print(params)
 # grid_results = grid_search(mlp, params, x_train, y_train)
 # grid_results
 # %% both relu & tanh models show promise, compare them both
-relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,))
-plot_vc(relu_mlp, x_train, y_train, 'alpha', [i for i in np.linspace(0,2,24)])
-tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50))
-plot_vc(tanh_mlp, x_train, y_train, 'alpha', [i for i in np.linspace(0,2,24)])
+# relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,))
+# plot_vc(relu_mlp, x_train, y_train, 'alpha', [i for i in np.linspace(0,2,24)])
+# tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50))
+# plot_vc(tanh_mlp, x_train, y_train, 'alpha', [i for i in np.linspace(0,2,24)])
+# %% tanh looks slightly better than relu
+# tuned_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087)
+# tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0.087)
+# check_cv_score(tuned_relu_mlp, x_train, y_train)
+# check_cv_score(tuned_tanh_mlp, x_train, y_train)
+# plot_lc(tuned_relu_mlp, x_train, y_train)
+# plot_lc(tuned_tanh_mlp, x_train, y_train)
+# %% let's see if we can improve the performance by tuning init
+# plot_vc(tuned_relu_mlp, x_train, y_train, 'learning_rate_init', [i for i in np.linspace(0,10,100)])
+# plot_vc(tuned_tanh_mlp, x_train, y_train, 'learning_rate_init', [i for i in np.linspace(0,10,100)])
+# %% tuning the init didn't really do much..
+# tuned_init_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087,learning_rate_init=0.101)
+# tuned_init_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0,learning_rate_init=0.101)
+# check_cv_score(tuned_init_relu_mlp, x_train, y_train)
+# check_cv_score(tuned_init_tanh_mlp, x_train, y_train)
+# plot_lc(tuned_init_relu_mlp, x_train, y_train)
+# plot_lc(tuned_init_tanh_mlp, x_train, y_train)
 # %%
-tuned_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087)
-tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0)
-check_cv_score(tuned_relu_mlp, x_train, y_train)
+# params = nn_learning_params
+# tuned_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087)
+tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0.087)
 check_cv_score(tuned_tanh_mlp, x_train, y_train)
-plot_lc(tuned_relu_mlp, x_train, y_train)
-plot_lc(tuned_tanh_mlp, x_train, y_train)
 # %%
-plot_vc(tuned_relu_mlp, x_train, y_train, 'learning_rate_init', [i for i in np.linspace(0,10,100)])
-plot_vc(tuned_tanh_mlp, x_train, y_train, 'learning_rate_init', [i for i in np.linspace(0,10,100)])
+# grid_results = grid_search(tuned_relu_mlp, params, x_train, y_train)
+# grid_results
 # %%
-tuned_init_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087,learning_rate_init=0.101)
-tuned_init_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0,learning_rate_init=0.101)
-check_cv_score(tuned_init_relu_mlp, x_train, y_train)
-check_cv_score(tuned_init_tanh_mlp, x_train, y_train)
-plot_lc(tuned_init_relu_mlp, x_train, y_train)
-plot_lc(tuned_init_tanh_mlp, x_train, y_train)
+# grid_results = grid_search(tuned_tanh_mlp, params, x_train, y_train)
+# grid_results
 # %%
+# tuned_relu_mlp = MLPClassifier(activation='relu',hidden_layer_sizes=(100,),alpha=0.087,max_iter=300)
+tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0.087,max_iter=300)
+# check_cv_score(tuned_relu_mlp, x_train, y_train)
+check_cv_score(tuned_tanh_mlp, x_train, y_train)
+# %%
+# params = nn_adam_params
+# grid_results = grid_search(tuned_tanh_mlp, params, x_train, y_train)
+# grid_results
+# %%
+params = nn_adam_tuned_params
+grid_results = grid_search(tuned_tanh_mlp, params, x_train, y_train)
+grid_results
+# %%
+tuned_tanh_adam_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0.087,max_iter=300,beta_1=0.2,beta_2=0.9,epsilon=7e-8)
+check_cv_score(tuned_tanh_adam_mlp, x_train, y_train)
+# %%
+plot_vc(tuned_tanh_adam_mlp, x_train, y_train, 'epsilon', [1e-8,2e-8,3e-8,4e-8,5e-8,6e-8,7e-8,8e-8])
+# %% unfortunately all of the tweaking doesn't seem to have paid off..
+plot_lc(tuned_tanh_adam_mlp, x_train, y_train)
+# %%
+tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alpha=0.087,max_iter=300)
+check_test_score(tuned_tanh_mlp, x_train, y_train, x_test, y_test)
+# %%
+plot_vc(tuned_tanh_mlp, x_train, y_train, 'max_iter', [100,150,200,250,300,350,400,450,500])

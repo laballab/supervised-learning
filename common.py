@@ -51,6 +51,22 @@ nn_params = {
     'solver': ['lbfgs', 'sgd', 'adam'],
     'hidden_layer_sizes': [(100,), (50,50), (30,30,30),(10,10,10,10,10,10,10,10,10)]
 }
+nn_learning_params = {
+    'tol': [i for i in np.linspace(0,0.0002,7)],
+    'learning_rate_init': [i for i in np.linspace(0,0.0002,7)],
+    'max_iter': [100,200,300],
+    'n_iter_no_change': [5,10,20]
+}
+nn_adam_params = {
+    'beta_1': [0.2,0.7,0.9,0.999],
+    'beta_2': [0.2,0.7,0.9,0.999],
+    'epsilon': [1e-8,0.5e-8,2e-8]
+}
+nn_adam_tuned_params = {
+    'beta_1': [0,0.2],
+    'beta_2': [0.9,0.999],
+    'epsilon': [1e-8,2e-8,4e-8,8e-8]
+}
 # %%
 def plot_vc(model, x, y, param_key, param_val, cv=5):
     print(cross_val_score(model, x, y, scoring='accuracy', cv=cv))
@@ -78,7 +94,6 @@ def plot_vc(model, x, y, param_key, param_val, cv=5):
     plt.show()
 # %%
 def plot_lc(model, x, y, cv=5, train_sizes=np.linspace(.1, 1.0, 10), ylim=None):
-    print(cross_val_score(model, x, y, scoring='accuracy', cv=cv))
     fig, lc_plot = plt.subplots()
     lc_plot.set_title("Learning curve for %s" % (model))
     lc_plot.set_ylim(*ylim) if ylim is not None else None
