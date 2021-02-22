@@ -6,6 +6,7 @@ import seaborn as sns
 import sklearn as sk
 
 from sklearn import metrics
+from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -27,7 +28,7 @@ dtree_extended_params = {
     'criterion': ['gini', 'entropy'],
     'splitter' : ['best', 'random'],
     'max_features' : [None, "sqrt", "log2"],
-    'max_depth' : [i for i in range(1,42)],
+    'max_depth' : [1,15,30,45],
     'min_samples_split' : [i for i in range(1,7)],
     'min_samples_leaf' : [i for i in range(1,7)]
 }
@@ -45,6 +46,11 @@ svm_params = {
 knn_params = {
     'n_neighbors': [i for i in range(1,42)],
     'weights' : ['uniform', 'distance']
+}
+knn_leaf_params = {
+    'weights' : ['uniform', 'distance'],
+    'algorithm': ['ball_tree', 'kd_tree'],
+    'leaf_size': [10,30,50,100]
 }
 nn_params = {
     'activation': ['identity', 'logistic', 'tanh', 'relu'],
@@ -66,6 +72,13 @@ nn_adam_tuned_params = {
     'beta_1': [0,0.2],
     'beta_2': [0.9,0.999],
     'epsilon': [1e-8,2e-8,4e-8,8e-8]
+}
+adaboost_params = {
+    'n_estimators': [i for i in (25,50,75,100)],
+    'learning_rate': [i for i in np.linspace(0.5,2,5)]
+}
+adaboost_estimators = {
+    'base_estimator': [DecisionTreeClassifier(), KNeighborsClassifier(), SVC(), MLPClassifier()]
 }
 # %%
 def plot_vc(model, x, y, param_key, param_val, cv=5):
@@ -102,7 +115,7 @@ def plot_lc(model, x, y, cv=5, train_sizes=np.linspace(.1, 1.0, 10), ylim=None):
 
     train_sizes, train_scores, test_scores = \
         learning_curve(model, x, y, cv=cv, n_jobs=8,
-                       train_sizes=train_sizes)
+                       train_sizes=train_sizes,random_state=7)
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
