@@ -102,6 +102,7 @@ leaf_knn = KNeighborsClassifier(algorithm='ball_tree',n_neighbors=3,p=5)
 plot_vc(leaf_knn, x_train, y_train, 'leaf_size', [i for i in range(1,42)])
 # %%
 plot_lc(p_tuned_knn, x_train, y_train)
+check_test_score(p_tuned_knn, x_train, y_train, x_test, y_test)
 # %% 
 # # [DT MODEL]
 # #
@@ -137,6 +138,7 @@ plot_vc(tuned_gini_dtree, x_train, y_train, 'min_samples_split',[i for i in rang
 # %% promising early results with gini & min_samples tweaked..
 minsplit_gini_dtree = DecisionTreeClassifier(criterion='gini',max_depth=15,min_samples_split=30)
 plot_lc(minsplit_gini_dtree, x_train, y_train, ylim=(0.25,1.05))
+check_test_score(minsplit_gini_dtree, x_train, y_train, x_test, y_test)
 # %% 
 # [SVM MODEL]
 #
@@ -173,6 +175,7 @@ plot_lc(tuned_poly_svm, x_train, y_train)
 # %% still sucks, going back to linear
 tuned_poly_svm=SVC(kernel='linear')
 plot_lc(tuned_poly_svm, x_train, y_train)
+check_test_score(tuned_svm, x_train, y_train, x_test, y_test)
 # %% 
 # [NN MODEL]
 #
@@ -224,9 +227,9 @@ tuned_tanh_mlp = MLPClassifier(activation='tanh',hidden_layer_sizes=(50,50),alph
 # check_cv_score(tuned_relu_mlp, x_train, y_train)
 check_cv_score(tuned_tanh_mlp, x_train, y_train)
 # %%
-# params = nn_adam_params
-# grid_results = grid_search(tuned_tanh_mlp, params, x_train, y_train)
-# grid_results
+params = nn_adam_params
+grid_results = grid_search(tuned_tanh_mlp, params, x_train, y_train)
+grid_results
 # %%
 params = nn_adam_tuned_params
 grid_results = grid_search(tuned_tanh_mlp, params, x_train, y_train)
@@ -274,3 +277,5 @@ adaboost = AdaBoostClassifier()
 params = adaboost_estimators
 grid_results = grid_search(adaboost, params, x_train, y_train)
 grid_results
+
+check_test_score(tuned_dt_adaboost, x_train, y_train, x_test, y_test)

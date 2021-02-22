@@ -203,6 +203,7 @@ plot_lc(tuned_svm, x_train, y_train)
 check_cv_score(tuned_svm, x_train, y_train)
 # %%
 plot_vc(tuned_svm, x_train, y_train, 'kernel',['linear','poly','rbf','sigmoid','precoputed'])
+check_test_score(tuned_svm, x_train, y_train, x_test, y_test)
 # %% 
 # [NN MODEL]
 #
